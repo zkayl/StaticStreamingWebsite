@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StreamClip Admin Dashboard</title>
+
+    <link rel="icon" href="favicon.ico?v=2" type="image/x-icon" />
+    <link rel="shortcut icon" href="favicon.ico?v=2" type="image/x-icon" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              streamBlack: "#0f0f0f",
+              streamRed: "#e50914",
+              streamDarkGray: "#141414",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+  </head>
+  <body class="bg-streamBlack text-white font-sans">
+    <div
+      id="login-screen"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90"
+    >
+      <div
+        class="bg-streamDarkGray p-8 rounded-xl border border-gray-800 shadow-2xl w-full max-w-md"
+      >
+        <h1 class="text-3xl font-bebas text-streamRed text-center mb-6">
+          ADMIN ACCESS
+        </h1>
+        <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+          <input
+            type="email"
+            id="admin-email"
+            placeholder="Admin Email"
+            class="w-full bg-black/50 border border-gray-700 rounded p-3 focus:border-streamRed outline-none"
+            required
+          />
+          <input
+            type="password"
+            id="admin-pass"
+            placeholder="Password"
+            class="w-full bg-black/50 border border-gray-700 rounded p-3 focus:border-streamRed outline-none"
+            required
+          />
+          <button
+            type="submit"
+            class="w-full bg-streamRed hover:bg-red-700 font-bold py-3 rounded transition"
+          >
+            LOGIN DASHBOARD
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div id="dashboard" class="hidden min-h-screen flex flex-col md:flex-row">
+      <aside
+        class="w-full md:w-64 bg-streamDarkGray border-r border-gray-800 flex flex-col h-screen sticky top-0 overflow-y-auto"
+      >
+        <div class="p-6 border-b border-gray-800">
+          <h1 class="text-3xl font-bebas text-streamRed">
+            STREAM<span class="text-white">CLIP</span>
+          </h1>
+          <p class="text-xs text-gray-500 tracking-widest">CMS PANEL v2.0</p>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+          <button
+            onclick="switchTab('list')"
+            class="w-full text-left px-4 py-3 rounded hover:bg-white/5 flex items-center gap-3 transition"
+          >
+            <i class="fas fa-list"></i> Daftar Film
+          </button>
+          <button
+            onclick="
+              resetForm();
+              switchTab('add');
+            "
+            class="w-full text-left px-4 py-3 rounded bg-streamRed/10 text-streamRed border border-streamRed/20 flex items-center gap-3 transition"
+          >
+            <i class="fas fa-plus"></i> Tambah Film Baru
+          </button>
+        </nav>
+        <div class="p-4 border-t border-gray-800">
+          <button
+            onclick="logoutAdmin()"
+            class="w-full text-left px-4 py-3 rounded hover:bg-red-900/20 text-gray-400 hover:text-red-500 flex items-center gap-3 transition"
+          >
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </aside>
+
+      <main class="flex-1 p-6 overflow-y-auto h-screen">
+        <div id="view-list" class="space-y-6">
+          <div class="flex justify-between items-end mb-6">
+            <div>
+              <h2 class="text-2xl font-bold leading-tight">Database Film</h2>
+              <p class="text-xs text-gray-500 mt-1">
+                Total:
+                <span id="total-movies-count" class="font-bold">...</span> Judul
+                Film
+              </p>
+            </div>
+            <div class="relative">
+              <input
+                type="text"
+                id="search-admin"
+                onkeyup="filterAdminList()"
+                placeholder="Cari judul..."
+                class="bg-gray-800 border border-gray-700 rounded-full px-4 py-2 text-sm w-64 focus:border-streamRed outline-none"
+              />
+              <i
+                class="fas fa-search absolute right-3 top-2.5 text-gray-500 text-xs"
+              ></i>
+            </div>
+          </div>
+
+          <div
+            class="bg-streamDarkGray rounded-xl border border-gray-800 overflow-hidden"
+          >
+            <table class="w-full text-sm text-left">
+              <thead class="bg-black/50 text-gray-400 uppercase text-xs">
+                <tr>
+                  <th class="px-6 py-3">ID</th>
+                  <th class="px-6 py-3">Poster</th>
+                  <th class="px-6 py-3">Judul</th>
+                  <th class="px-6 py-3">Type</th>
+                  <th class="px-6 py-3">Status</th>
+                  <th class="px-6 py-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody
+                id="movie-table-body"
+                class="divide-y divide-gray-800"
+              ></tbody>
+            </table>
+          </div>
+
+          <div
+            id="admin-pagination"
+            class="flex justify-center items-center gap-2 mt-6 flex-wrap pb-10"
+          ></div>
+        </div>
+
+        <div id="view-add" class="hidden max-w-5xl mx-auto pb-20">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-4">
+              <button
+                onclick="switchTab('list')"
+                class="bg-gray-800 hover:bg-gray-700 w-10 h-10 rounded-full flex items-center justify-center transition"
+              >
+                <i class="fas fa-arrow-left"></i>
+              </button>
+              <h2 class="text-2xl font-bold" id="form-title">
+                Tambah Film Baru
+              </h2>
+            </div>
+
+            <button
+              onclick="openImportModal()"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg flex items-center gap-2"
+            >
+              <i class="fas fa-file-import"></i> Import JSON
+            </button>
+          </div>
+
+          <form
+            id="form-movie"
+            onsubmit="handleSaveMovie(event)"
+            class="space-y-6"
+          >
+            <input type="hidden" id="inp-id" />
+
+            <div
+              class="bg-streamDarkGray p-6 rounded-xl border border-gray-800 space-y-6"
+            >
+              <h3
+                class="font-bold text-lg text-streamRed border-b border-gray-700 pb-2"
+              >
+                Informasi Utama
+              </h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1"
+                    >Judul Film</label
+                  >
+                  <input
+                    type="text"
+                    id="inp-judul"
+                    required
+                    class="w-full bg-black/50 border border-gray-700 rounded p-2.5 focus:border-streamRed outline-none"
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1"
+                    >URL Poster</label
+                  >
+                  <input
+                    type="url"
+                    id="inp-poster"
+                    required
+                    class="w-full bg-black/50 border border-gray-700 rounded p-2.5 focus:border-streamRed outline-none"
+                  />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1">Tipe</label>
+                  <select
+                    id="inp-type"
+                    onchange="toggleTypeFields()"
+                    class="w-full bg-black/50 border border-gray-700 rounded p-2.5 focus:border-streamRed outline-none"
+                  >
+                    <option value="movie">Movie</option>
+                    <option value="series">Series</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1">Status</label>
+                  <select
+                    id="inp-status"
+                    class="w-full bg-black/50 border border-gray-700 rounded p-2.5 focus:border-streamRed outline-none"
+                  >
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Upcoming">Upcoming</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1">Rating</label>
+                  <input
+                    type="text"
+                    id="inp-rating"
+                    class="w-full bg-black/50 border border-gray-700 rounded p-2.5 focus:border-streamRed outline-none"
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1">Durasi</label>
+                  <input
+                    type="text"
+                    id="inp-durasi"
+                    class="w-full bg-black/50 border border-gray-700 rounded p-2.5 focus:border-streamRed outline-none"
+                  />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1"
+                    >Tahun Rilis</label
+                  >
+                  <input
+                    type="text"
+                    id="inp-rilis"
+                    class="w-full bg-black/50 border border-gray-700 rounded p-2.5 focus:border-streamRed outline-none"
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1"
+                    >Total Episode</label
+                  >
+                  <input
+                    type="text"
+                    id="inp-total-eps"
+                    class="w-full bg-black/50 border border-gray-700 rounded p-2.5 focus:border-streamRed outline-none"
+                    placeholder="ex: 12 / ?"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs text-gray-400 mb-1"
+                  >Genre (Pisahkan koma)</label
+                >
+                <input
+                  type="text"
+                  id="inp-genre"
+                  placeholder="Action, Adventure"
+                  class="w-full bg-black/50 border border-gray-700 rounded p-2.5 focus:border-streamRed outline-none"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Sinopsis</label>
+                <textarea
+                  id="inp-desc"
+                  rows="3"
+                  class="w-full bg-black/50 border border-gray-700 rounded p-2.5 focus:border-streamRed outline-none"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div
+                class="bg-streamDarkGray p-6 rounded-xl border border-gray-800"
+              >
+                <div
+                  class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2"
+                >
+                  <h3 class="font-bold text-gray-300">Daftar Cast / Pemain</h3>
+                  <button
+                    type="button"
+                    onclick="addCastInput()"
+                    class="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
+                  >
+                    + Add Cast
+                  </button>
+                </div>
+                <div
+                  id="cast-list-input"
+                  class="space-y-3 max-h-60 overflow-y-auto pr-2"
+                ></div>
+              </div>
+
+              <div
+                class="bg-streamDarkGray p-6 rounded-xl border border-gray-800"
+              >
+                <div
+                  class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2"
+                >
+                  <h3 class="font-bold text-gray-300">Link Download</h3>
+                  <button
+                    type="button"
+                    onclick="addDownloadInput()"
+                    class="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+                  >
+                    + Add Link
+                  </button>
+                </div>
+                <div
+                  id="download-list-input"
+                  class="space-y-3 max-h-60 overflow-y-auto pr-2"
+                ></div>
+              </div>
+            </div>
+
+            <div
+              class="bg-streamDarkGray p-6 rounded-xl border border-gray-800"
+            >
+              <div class="mb-4 border-b border-gray-700 pb-2">
+                <h3 class="font-bold text-lg text-streamRed">Sumber Video</h3>
+              </div>
+
+              <div id="section-movie-source">
+                <label class="block text-xs text-gray-400 mb-1"
+                  >Embed URL (Movie)</label
+                >
+                <input
+                  type="text"
+                  id="inp-embed"
+                  class="w-full bg-black/50 border border-gray-700 rounded p-2.5 focus:border-streamRed outline-none"
+                  placeholder="https://..."
+                />
+              </div>
+
+              <div id="section-series-source" class="hidden mt-4">
+                <div class="flex justify-between items-center mb-3">
+                  <span class="text-sm text-gray-400">List Episode</span>
+                  <button
+                    type="button"
+                    onclick="addEpisodeInput()"
+                    class="text-xs bg-streamRed px-2 py-1 rounded hover:bg-red-700"
+                  >
+                    + Tambah Eps
+                  </button>
+                </div>
+                <div
+                  id="episode-list-input"
+                  class="space-y-3 max-h-80 overflow-y-auto pr-2"
+                ></div>
+              </div>
+            </div>
+
+            <div
+              class="flex justify-end gap-4 mt-8 pt-4 border-t border-gray-800"
+            >
+              <button
+                type="button"
+                onclick="
+                  resetForm();
+                  switchTab('list');
+                "
+                class="px-6 py-3 rounded border border-gray-600 hover:bg-gray-800"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                class="px-8 py-3 rounded bg-streamRed hover:bg-red-700 font-bold shadow-lg shadow-red-900/20"
+              >
+                SIMPAN DATA
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+
+    <div
+      id="import-modal"
+      class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in"
+    >
+      <div
+        class="bg-streamDarkGray w-full max-w-2xl rounded-xl border border-gray-800 shadow-2xl p-6 relative"
+      >
+        <button
+          onclick="closeImportModal()"
+          class="absolute top-4 right-4 text-gray-400 hover:text-white"
+        >
+          <i class="fas fa-times text-xl"></i>
+        </button>
+        <h3
+          class="text-xl font-bold text-white mb-4 border-b border-gray-700 pb-3"
+        >
+          <i class="fas fa-file-code mr-2 text-blue-500"></i> Import JSON
+        </h3>
+        <p class="text-xs text-gray-400 mb-2">
+          Paste kode JSON lengkap di bawah ini untuk mengisi form secara
+          otomatis.
+        </p>
+        <textarea
+          id="import-json-area"
+          class="w-full h-64 bg-black/50 border border-gray-700 rounded-lg p-3 text-xs text-green-400 font-mono outline-none focus:border-blue-500"
+          placeholder='{ "judul": "...", "cast": [...] }'
+        ></textarea>
+        <div class="flex justify-end gap-3 mt-4">
+          <button
+            onclick="closeImportModal()"
+            class="px-4 py-2 rounded border border-gray-600 text-gray-300 hover:bg-gray-800"
+          >
+            Batal
+          </button>
+          <button
+            onclick="handleJsonImport()"
+            class="px-6 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold"
+          >
+            Proses Import
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="delete-modal"
+      class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in"
+    >
+      <div
+        class="bg-streamDarkGray w-full max-w-sm rounded-xl border border-gray-800 shadow-2xl p-6 text-center transform transition-all scale-100"
+      >
+        <div
+          class="w-16 h-16 bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <i class="fas fa-trash-alt text-2xl text-streamRed"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2">Hapus Film Ini?</h3>
+        <p class="text-sm text-gray-400 mb-6">
+          Tindakan ini tidak dapat dibatalkan. Data film akan hilang permanen
+          dari database.
+        </p>
+        <div class="flex gap-3 justify-center">
+          <button
+            onclick="closeDeleteModal()"
+            class="flex-1 px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white transition"
+          >
+            Batal
+          </button>
+          <button
+            onclick="confirmDelete()"
+            class="flex-1 px-4 py-2 rounded-lg bg-streamRed hover:bg-red-700 text-white font-bold shadow-lg shadow-red-900/20 transition"
+          >
+            Ya, Hapus
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/toastify-js"
+    ></script>
+    <script type="module" src="admin.js"></script>
+  </body>
+</html>

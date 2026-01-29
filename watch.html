@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nonton Film - StreamClip</title>
+
+    <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon" />
+    <link rel="shortcut icon" href="/favicon.ico?v=2" type="image/x-icon" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              streamBlack: "#0f0f0f",
+              streamRed: "#e50914",
+              streamDarkGray: "#141414",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+  <body class="bg-streamBlack text-white font-sans antialiased">
+    <nav
+      class="fixed top-0 w-full z-50 py-4 bg-streamBlack border-b border-gray-800"
+    >
+      <div class="container mx-auto px-4 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2 group">
+          <i
+            class="fas fa-arrow-left text-gray-400 group-hover:text-streamRed transition-colors"
+          ></i>
+          <h1
+            class="text-2xl font-bebas text-streamRed tracking-wide leading-none"
+          >
+            STREAM<span class="text-white">CLIP</span>
+          </h1>
+        </a>
+      </div>
+    </nav>
+
+    <main class="container mx-auto max-w-6xl px-4 pt-24 pb-20">
+      <div
+        id="loading-state"
+        class="w-full h-[50vh] flex items-center justify-center"
+      >
+        <div
+          class="animate-spin w-12 h-12 border-4 border-streamRed border-t-transparent rounded-full"
+        ></div>
+      </div>
+
+      <div id="content-area" class="hidden animate-fade-in">
+        <nav class="text-xs text-gray-400 mb-4">
+          <span id="breadcrumb-text">Home > Movie</span>
+        </nav>
+
+        <div
+          class="w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl shadow-red-900/10 border border-gray-800 mb-6 relative group"
+        >
+          <div
+            id="video-wrapper"
+            class="w-full h-full flex items-center justify-center"
+          ></div>
+        </div>
+
+        <div
+          class="flex flex-col md:flex-row justify-between items-start gap-4 mb-4"
+        >
+          <div class="flex-1">
+            <h1
+              id="movie-title"
+              class="text-2xl md:text-4xl font-bold text-white leading-tight mb-2"
+            ></h1>
+            <div id="movie-tags" class="flex flex-wrap gap-2 text-xs"></div>
+          </div>
+
+          <div class="flex gap-3 flex-wrap">
+            <button
+              id="btn-favorite"
+              onclick="toggleFavorite()"
+              class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-bold transition-all active:scale-95 border border-gray-600 flex items-center gap-2"
+            >
+              <i class="far fa-heart"></i> <span>Favorit</span>
+            </button>
+            <button
+              onclick="shareMovie()"
+              class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-bold transition-transform active:scale-95 flex items-center gap-2"
+            >
+              <i class="fas fa-share-alt"></i> Share
+            </button>
+            <button
+              onclick="goToDownload()"
+              class="bg-streamRed hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-bold transition-transform active:scale-95 shadow-lg shadow-red-900/30 flex items-center gap-2"
+            >
+              <i class="fas fa-download"></i> Download
+            </button>
+          </div>
+        </div>
+
+        <div id="episode-container" class="hidden mb-8">
+          <h3
+            class="text-lg font-bold text-white mb-6 border-l-4 border-streamRed pl-3"
+          >
+            Daftar Episode
+          </h3>
+
+          <div class="relative group/list">
+            <div
+              id="episode-list"
+              class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide select-none cursor-grab active:cursor-grabbing scroll-smooth"
+            ></div>
+          </div>
+        </div>
+
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-gray-800 pt-8"
+        >
+          <div class="md:col-span-2">
+            <h3
+              class="text-xl font-bold text-white mb-3 border-l-4 border-streamRed pl-3"
+            >
+              Sinopsis
+            </h3>
+            <p
+              id="movie-desc"
+              class="text-gray-400 text-sm md:text-base leading-relaxed whitespace-pre-line"
+            ></p>
+          </div>
+
+          <div class="h-fit">
+            <h3
+              class="text-sm font-bold text-gray-500 mb-4 uppercase tracking-wider border-l-4 border-streamRed pl-3"
+            >
+              Detail Informasi
+            </h3>
+            <div id="metadata-grid" class="space-y-3 text-sm"></div>
+          </div>
+        </div>
+
+        <div
+          id="cast-container"
+          class="hidden mt-8 border-t border-gray-800 pt-8"
+        >
+          <h3
+            class="text-xl font-bold text-white mb-4 border-l-4 border-streamRed pl-3"
+          >
+            Top Cast
+          </h3>
+          <div
+            id="cast-list"
+            class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide select-none cursor-grab active:cursor-grabbing"
+          ></div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="bg-black border-t border-gray-900 pt-16 pb-8 mt-10">
+      <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          <div>
+            <h2 class="text-3xl font-bebas text-streamRed mb-4">
+              STREAM<span class="text-white">CLIP</span>
+            </h2>
+            <p class="text-gray-500 text-sm mb-6">
+              Platform streaming online gratis.
+            </p>
+
+            <div class="flex gap-4">
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-streamRed hover:text-white"
+              >
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-streamRed hover:text-white"
+              >
+                <i class="fa-brands fa-x-twitter"></i>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-white font-bold mb-6 uppercase text-sm">
+              StreamClip
+            </h3>
+            <ul class="text-gray-500 text-sm space-y-3">
+              <li>
+                <a
+                  href="javascript:void(0)"
+                  onclick="openModal('modal-about')"
+                  class="hover:text-streamRed"
+                  >Tentang Kami</a
+                >
+              </li>
+              <li>
+                <a
+                  href="javascript:void(0)"
+                  onclick="openModal('modal-contact')"
+                  class="hover:text-streamRed"
+                  >Hubungi Kami</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-white font-bold mb-6 uppercase text-sm">Bantuan</h3>
+            <ul class="text-gray-500 text-sm space-y-3">
+              <li>
+                <a
+                  href="javascript:void(0)"
+                  onclick="openModal('modal-request')"
+                  class="hover:text-streamRed"
+                  >Request Film</a
+                >
+              </li>
+              <li>
+                <a
+                  href="javascript:void(0)"
+                  onclick="openModal('modal-report')"
+                  class="hover:text-streamRed"
+                  >Lapor Error</a
+                >
+              </li>
+              <li>
+                <a
+                  href="javascript:void(0)"
+                  onclick="openModal('modal-privacy')"
+                  class="hover:text-streamRed"
+                  >Kebijakan Privasi</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-white font-bold mb-6 uppercase text-sm">
+              Download Aplikasi StreamClip
+            </h3>
+            <a
+              href="#"
+              target="_blank"
+              class="inline-block bg-streamRed hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full text-sm shadow-lg"
+            >
+              <i class="fas fa-download mr-2"></i> Download StreamClip APK
+            </a>
+          </div>
+        </div>
+
+        <div
+          class="border-t border-gray-900 pt-8 flex flex-col md:flex-row justify-between gap-6 items-center"
+        >
+          <p class="text-gray-600 text-xs">
+            &copy; 2026 StreamClip. All rights reserved.
+          </p>
+          <div class="text-gray-700 text-xs max-w-xl text-center md:text-right">
+            <p class="font-bold mb-1">DMCA DISCLAIMER</p>
+            <p>
+              StreamClip does not host any files on its servers. All content is
+              provided by third-party sources publicly available on the
+              internet.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <div
+      id="modal-about"
+      class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4"
+    >
+      <div class="bg-streamDarkGray max-w-lg w-full rounded-lg p-6 relative">
+        <button
+          onclick="closeModal('modal-about')"
+          class="absolute top-4 right-4 text-gray-400"
+        >
+          ✕
+        </button>
+        <h2 class="text-xl text-white mb-3">Tentang StreamClip</h2>
+        <div class="text-gray-300 text-sm leading-relaxed space-y-3">
+          <p>
+            <strong>StreamClip</strong> adalah platform streaming online gratis
+            yang menyediakan beragam konten hiburan digital, termasuk film,
+            serial, dan tayangan hiburan lainnya.
+          </p>
+          <p>
+            Kami berkomitmen untuk memberikan pengalaman menonton yang cepat,
+            mudah, dan nyaman tanpa proses yang rumit. StreamClip dirancang agar
+            pengguna dapat menemukan konten favorit dengan lebih praktis.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="modal-contact"
+      class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4"
+    >
+      <div class="bg-streamDarkGray max-w-md w-full rounded-lg p-6 relative">
+        <button
+          onclick="closeModal('modal-contact')"
+          class="absolute top-4 right-4 text-gray-400"
+        >
+          ✕
+        </button>
+        <h2 class="text-xl text-white mb-4">Hubungi Kami</h2>
+        <form
+          name="hubungi-kami"
+          method="POST"
+          data-netlify="true"
+          class="space-y-4"
+        >
+          <input type="hidden" name="form-name" value="hubungi-kami" />
+          <input
+            type="text"
+            name="nama_pengirim"
+            placeholder="Nama Anda"
+            required
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          />
+          <textarea
+            name="pesan"
+            placeholder="Pesan Anda"
+            required
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          ></textarea>
+          <button
+            type="submit"
+            class="w-full bg-streamRed text-white py-2 rounded"
+          >
+            Kirim Pesan
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="modal-request"
+      class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4"
+    >
+      <div class="bg-streamDarkGray max-w-md w-full rounded-lg p-6 relative">
+        <button
+          onclick="closeModal('modal-request')"
+          class="absolute top-4 right-4 text-gray-400"
+        >
+          ✕
+        </button>
+        <h2 class="text-xl text-white mb-4">Request Film</h2>
+        <form
+          name="request-film"
+          method="POST"
+          data-netlify="true"
+          class="space-y-4"
+        >
+          <input type="hidden" name="form-name" value="request-film" />
+          <input
+            type="text"
+            name="nama_pemohon"
+            placeholder="Nama Anda"
+            required
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          />
+          <textarea
+            name="judul_film"
+            placeholder="Judul Film / Series"
+            required
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          ></textarea>
+          <button
+            type="submit"
+            class="w-full bg-streamRed text-white py-2 rounded"
+          >
+            Kirim Request
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="modal-report"
+      class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4"
+    >
+      <div class="bg-streamDarkGray max-w-md w-full rounded-lg p-6 relative">
+        <button
+          onclick="closeModal('modal-report')"
+          class="absolute top-4 right-4 text-gray-400"
+        >
+          ✕
+        </button>
+        <h2 class="text-xl text-white mb-4">Lapor Error</h2>
+        <form
+          name="lapor-error"
+          method="POST"
+          data-netlify="true"
+          class="space-y-4"
+        >
+          <input type="hidden" name="form-name" value="lapor-error" />
+          <input
+            type="text"
+            name="nama_pelapor"
+            placeholder="Nama Anda"
+            required
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          />
+          <input
+            type="text"
+            name="judul_film"
+            placeholder="Judul Film / Series"
+            required
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          />
+          <input
+            type="text"
+            name="episode"
+            placeholder="Episode (Opsional)"
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          />
+          <button
+            type="submit"
+            class="w-full bg-streamRed text-white py-2 rounded"
+          >
+            Kirim Laporan
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="modal-privacy"
+      class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4"
+    >
+      <div class="bg-streamDarkGray max-w-lg w-full rounded-lg p-6 relative">
+        <button
+          onclick="closeModal('modal-privacy')"
+          class="absolute top-4 right-4 text-gray-400"
+        >
+          ✕
+        </button>
+        <h2 class="text-xl text-white mb-4">Kebijakan Privasi</h2>
+        <div
+          class="text-gray-300 text-sm leading-relaxed space-y-3 h-64 overflow-y-auto scrollbar-hide"
+        >
+          <p>
+            <strong>StreamClip</strong> menghormati privasi setiap pengguna yang
+            mengakses dan menggunakan layanan kami. Pengguna dapat menikmati
+            konten di StreamClip tanpa harus melakukan login atau pendaftaran
+            akun.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function openModal(id) {
+        document.getElementById(id).classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+      }
+      function closeModal(id) {
+        document.getElementById(id).classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+      }
+    </script>
+
+    <script type="module" src="/watch.js"></script>
+  </body>
+</html>

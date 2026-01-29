@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="icon" href="favicon.ico?v=2" type="image/x-icon" />
+    <link rel="shortcut icon" href="favicon.ico?v=2" type="image/x-icon" />
+
+    <title>StreamClip - Nonton Film & Series Gratis</title>
+    <meta
+      name="description"
+      content="Nonton streaming film, drakor, anime, dan series subtitle Indonesia gratis."
+    />
+
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#e50914" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              streamBlack: "#0f0f0f",
+              streamRed: "#e50914",
+              streamDarkGray: "#141414",
+              streamLightGray: "#e5e5e5",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+  <body
+    class="bg-streamBlack text-white font-sans antialiased selection:bg-streamRed selection:text-white"
+  >
+    <nav
+      id="navbar"
+      class="fixed top-0 w-full z-50 transition-all duration-300 py-4 bg-gradient-to-b from-black/90 to-transparent"
+    >
+      <div
+        class="container mx-auto px-4 flex justify-between items-center gap-4"
+      >
+        <div
+          class="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform shrink-0"
+          onclick="goHome()"
+        >
+          <h1
+            class="text-4xl md:text-5xl font-bebas text-streamRed tracking-wide leading-none drop-shadow-md"
+          >
+            STREAM<span class="text-white">CLIP</span>
+          </h1>
+
+          <p
+            class="text-[0.4rem] md:text-[0.5rem] text-gray-400 font-bold uppercase tracking-widest leading-none mt-0 w-full text-center border-t border-gray-800 pt-0.5"
+          >
+            Streaming Film Subtitle Indonesia
+          </p>
+        </div>
+
+        <div class="hidden md:block flex-grow max-w-lg relative mx-4">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Cari judul film disini..."
+            class="w-full bg-black/50 backdrop-blur-sm text-white border border-gray-600 rounded-full py-2 px-5 pl-10 focus:outline-none focus:border-streamRed focus:bg-black/80 transition-all placeholder-gray-400 text-sm"
+          />
+          <i
+            class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          ></i>
+        </div>
+
+        <div class="flex items-center gap-4 md:gap-6">
+          <button
+            class="md:hidden text-gray-300 hover:text-white"
+            onclick="
+              document
+                .getElementById('mobile-search')
+                .classList.toggle('hidden')
+            "
+          >
+            <i class="fas fa-search text-xl"></i>
+          </button>
+
+          <div class="relative group z-50">
+            <div
+              id="profile-trigger"
+              class="flex flex-col items-center cursor-pointer transition-transform hover:scale-105"
+              onclick="handleProfileClick()"
+            >
+              <div class="relative">
+                <img
+                  id="navbar-avatar"
+                  src="https://placehold.co/100x100/333/fff?text=Guest"
+                  class="w-9 h-9 rounded-full border-2 border-gray-600 group-hover:border-streamRed transition-colors object-cover"
+                />
+
+                <div
+                  id="login-indicator"
+                  class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-gray-500 rounded-full border-2 border-streamBlack"
+                ></div>
+              </div>
+              <span
+                id="navbar-login-text"
+                class="text-[10px] text-gray-400 font-bold mt-0.5 group-hover:text-white"
+                >LOGIN</span
+              >
+            </div>
+
+            <div
+              id="user-dropdown"
+              class="absolute right-0 mt-3 w-56 bg-streamDarkGray border border-gray-700 rounded-lg shadow-2xl opacity-0 invisible transition-all duration-200 transform origin-top-right scale-95 z-50"
+            >
+              <div class="p-3 border-b border-gray-700">
+                <p id="dropdown-name" class="text-white font-bold truncate">
+                  User Name
+                </p>
+                <p id="dropdown-email" class="text-xs text-gray-500 truncate">
+                  user@example.com
+                </p>
+              </div>
+              <div class="py-1">
+                <a
+                  href="riwayat.html"
+                  class="flex items-center px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-streamRed transition-colors"
+                >
+                  <i class="fas fa-history w-6"></i> Riwayat Tontonan
+                </a>
+
+                <a
+                  href="favorit.html"
+                  class="flex items-center px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-streamRed transition-colors"
+                >
+                  <i class="fas fa-heart w-6"></i> Film Favorit
+                </a>
+
+                <div class="border-t border-gray-700 my-1"></div>
+                <a
+                  href="#"
+                  onclick="logout()"
+                  class="flex items-center px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                >
+                  <i class="fas fa-sign-out-alt w-6"></i> Keluar
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="mobile-search"
+        class="hidden px-4 pb-4 md:hidden animate-fade-in-down"
+      >
+        <input
+          type="text"
+          id="search-input-mobile"
+          placeholder="Cari film..."
+          class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:border-streamRed"
+        />
+      </div>
+    </nav>
+
+    <div
+      id="auth-modal"
+      class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 animate-fade-in"
+    >
+      <div
+        class="bg-streamDarkGray w-full max-w-md rounded-xl border border-gray-700 shadow-2xl relative overflow-hidden"
+      >
+        <button
+          onclick="closeAuthModal()"
+          class="absolute top-4 right-4 text-gray-400 hover:text-white z-10"
+        >
+          <i class="fas fa-times text-xl"></i>
+        </button>
+
+        <div class="flex border-b border-gray-700">
+          <button
+            id="tab-login"
+            onclick="switchAuthTab('login')"
+            class="flex-1 py-4 text-sm font-bold text-streamRed border-b-2 border-streamRed bg-white/5"
+          >
+            MASUK
+          </button>
+          <button
+            id="tab-register"
+            onclick="switchAuthTab('register')"
+            class="flex-1 py-4 text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+          >
+            DAFTAR
+          </button>
+        </div>
+
+        <div class="p-6 md:p-8">
+          <div id="form-login" class="space-y-5">
+            <div class="text-center mb-6">
+              <h2 class="text-2xl font-bebas tracking-wide text-white">
+                Selamat Datang Kembali
+              </h2>
+              <p class="text-xs text-gray-400">
+                Masuk untuk menyimpan riwayat & favorit.
+              </p>
+            </div>
+
+            <form onsubmit="handleEmailLogin(event)">
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1 ml-1"
+                    >Email</label
+                  >
+                  <div class="relative">
+                    <i
+                      class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"
+                    ></i>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      class="w-full bg-black/40 border border-gray-600 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:border-streamRed focus:ring-1 focus:ring-streamRed outline-none transition-all"
+                      placeholder="noclip@gmail.com"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1 ml-1"
+                    >Password</label
+                  >
+                  <div class="relative">
+                    <i
+                      class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"
+                    ></i>
+
+                    <input
+                      type="password"
+                      id="login-password"
+                      name="password"
+                      required
+                      class="w-full bg-black/40 border border-gray-600 rounded-lg py-2.5 pl-10 pr-10 text-sm text-white focus:border-streamRed focus:ring-1 focus:ring-streamRed outline-none transition-all"
+                      placeholder="••••••••"
+                    />
+
+                    <button
+                      type="button"
+                      onclick="
+                        togglePassword('login-password', 'icon-login-pass')
+                      "
+                      class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white focus:outline-none"
+                    >
+                      <i id="icon-login-pass" class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <button
+                type="submit"
+                class="w-full bg-streamRed hover:bg-red-700 text-white font-bold py-3 rounded-lg mt-6 text-sm transition-transform active:scale-95 shadow-lg shadow-red-900/20"
+              >
+                MASUK SEKARANG
+              </button>
+            </form>
+
+            <div class="relative py-2">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-700"></div>
+              </div>
+              <div class="relative flex justify-center text-xs">
+                <span class="px-2 bg-streamDarkGray text-gray-500">ATAU</span>
+              </div>
+            </div>
+
+            <button
+              onclick="loginWithGoogle()"
+              class="w-full bg-white hover:bg-gray-100 text-gray-900 font-bold py-2.5 rounded-lg text-sm flex items-center justify-center gap-2 transition-transform active:scale-95"
+            >
+              <img
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                class="w-5 h-5"
+              />
+              Masuk dengan Google
+            </button>
+
+            <p class="text-center text-xs text-gray-500 mt-4">
+              Belum punya akun?
+              <a
+                href="#"
+                onclick="switchAuthTab('register')"
+                class="text-streamRed hover:underline"
+                >Daftar disini</a
+              >
+            </p>
+          </div>
+
+          <div id="form-register" class="space-y-5 hidden">
+            <div class="text-center mb-6">
+              <h2 class="text-2xl font-bebas tracking-wide text-white">
+                Buat Akun Baru
+              </h2>
+              <p class="text-xs text-gray-400">
+                Gabung komunitas StreamClip gratis!
+              </p>
+            </div>
+
+            <form onsubmit="handleEmailRegister(event)">
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1 ml-1"
+                    >Nama Lengkap</label
+                  >
+                  <div class="relative">
+                    <i
+                      class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"
+                    ></i>
+                    <input
+                      type="text"
+                      name="name"
+                      required
+                      class="w-full bg-black/40 border border-gray-600 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:border-streamRed focus:ring-1 focus:ring-streamRed outline-none transition-all"
+                      placeholder="Nama Anda"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1 ml-1"
+                    >Email</label
+                  >
+                  <div class="relative">
+                    <i
+                      class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"
+                    ></i>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      class="w-full bg-black/40 border border-gray-600 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:border-streamRed focus:ring-1 focus:ring-streamRed outline-none transition-all"
+                      placeholder="nama@email.com"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-400 mb-1 ml-1"
+                    >Password</label
+                  >
+                  <div class="relative">
+                    <i
+                      class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"
+                    ></i>
+
+                    <input
+                      type="password"
+                      id="register-password"
+                      name="password"
+                      required
+                      minlength="6"
+                      class="w-full bg-black/40 border border-gray-600 rounded-lg py-2.5 pl-10 pr-10 text-sm text-white focus:border-streamRed focus:ring-1 focus:ring-streamRed outline-none transition-all"
+                      placeholder="Minimal 6 karakter"
+                    />
+
+                    <button
+                      type="button"
+                      onclick="
+                        togglePassword(
+                          'register-password',
+                          'icon-register-pass',
+                        )
+                      "
+                      class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white focus:outline-none"
+                    >
+                      <i id="icon-register-pass" class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <button
+                type="submit"
+                class="w-full bg-white hover:bg-gray-200 text-black font-bold py-3 rounded-lg mt-6 text-sm transition-transform active:scale-95"
+              >
+                DAFTAR AKUN
+              </button>
+            </form>
+
+            <p class="text-center text-xs text-gray-500 mt-4">
+              Sudah punya akun?
+              <a
+                href="#"
+                onclick="switchAuthTab('login')"
+                class="text-streamRed hover:underline"
+                >Masuk disini</a
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main
+      id="main-content"
+      class="pt-28 pb-20 px-4 container mx-auto min-h-screen"
+    >
+      <div class="mb-6 overflow-x-auto">
+        <div
+          class="flex gap-2 md:gap-4 min-w-max pb-2"
+          id="category-tabs"
+        ></div>
+      </div>
+      <div id="recommendation-section" class="mb-10">
+        <h3
+          class="text-xl font-bold mb-4 text-white border-l-4 border-streamRed pl-3"
+          id="rec-title"
+        >
+          Rekomendasi Hari Ini
+        </h3>
+        <div
+          id="recommendation-list"
+          class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide select-none"
+        ></div>
+      </div>
+      <div>
+        <h3
+          class="text-xl font-bold mb-4 text-white border-l-4 border-streamRed pl-3"
+          id="main-list-title"
+        >
+          Daftar Film
+        </h3>
+        <div
+          id="movie-grid"
+          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"
+        ></div>
+      </div>
+      <div
+        id="pagination-container"
+        class="flex justify-center items-center gap-2 mt-12 flex-wrap"
+      ></div>
+    </main>
+
+    <footer class="bg-black border-t border-gray-900 pt-16 pb-8 mt-10">
+      <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          <div>
+            <h2 class="text-3xl font-bebas text-streamRed mb-4">
+              STREAM<span class="text-white">CLIP</span>
+            </h2>
+            <p class="text-gray-500 text-sm mb-6">
+              Platform streaming online gratis.
+            </p>
+
+            <div class="flex gap-4">
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-streamRed hover:text-white"
+              >
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-streamRed hover:text-white"
+              >
+                <i class="fa-brands fa-x-twitter"></i>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-white font-bold mb-6 uppercase text-sm">
+              StreamClip
+            </h3>
+            <ul class="text-gray-500 text-sm space-y-3">
+              <li>
+                <a
+                  href="javascript:void(0)"
+                  onclick="openModal('modal-about')"
+                  class="hover:text-streamRed"
+                  >Tentang Kami</a
+                >
+              </li>
+              <li>
+                <a
+                  href="javascript:void(0)"
+                  onclick="openModal('modal-contact')"
+                  class="hover:text-streamRed"
+                  >Hubungi Kami</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-white font-bold mb-6 uppercase text-sm">Bantuan</h3>
+            <ul class="text-gray-500 text-sm space-y-3">
+              <li>
+                <a
+                  href="javascript:void(0)"
+                  onclick="openModal('modal-request')"
+                  class="hover:text-streamRed"
+                  >Request Film</a
+                >
+              </li>
+              <li>
+                <a
+                  href="javascript:void(0)"
+                  onclick="openModal('modal-report')"
+                  class="hover:text-streamRed"
+                  >Lapor Error</a
+                >
+              </li>
+              <li>
+                <a
+                  href="javascript:void(0)"
+                  onclick="openModal('modal-privacy')"
+                  class="hover:text-streamRed"
+                  >Kebijakan Privasi</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-white font-bold mb-6 uppercase text-sm">
+              Download Aplikasi StreamClip
+            </h3>
+            <a
+              href="#"
+              target="_blank"
+              class="inline-block bg-streamRed hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full text-sm shadow-lg"
+            >
+              <i class="fas fa-download mr-2"></i> Download StreamClip APK
+            </a>
+          </div>
+        </div>
+
+        <div
+          class="border-t border-gray-900 pt-8 flex flex-col md:flex-row justify-between gap-6 items-center"
+        >
+          <p class="text-gray-600 text-xs">
+            &copy; 2026 StreamClip. All rights reserved.
+          </p>
+
+          <div class="text-gray-700 text-xs max-w-xl text-center md:text-right">
+            <p class="font-bold mb-1">DMCA DISCLAIMER</p>
+            <p>
+              StreamClip does not host any files on its servers. All content is
+              provided by third-party sources publicly available on the
+              internet.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <div
+      id="modal-about"
+      class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4"
+    >
+      <div class="bg-streamDarkGray max-w-lg w-full rounded-lg p-6 relative">
+        <button
+          onclick="closeModal('modal-about')"
+          class="absolute top-4 right-4 text-gray-400"
+        >
+          ✕
+        </button>
+
+        <h2 class="text-xl text-white mb-3">Tentang StreamClip</h2>
+
+        <div class="text-gray-300 text-sm leading-relaxed space-y-3">
+          <p>
+            <strong>StreamClip</strong> adalah platform streaming online gratis
+            yang menyediakan beragam konten hiburan digital, termasuk film,
+            serial, dan tayangan hiburan lainnya.
+          </p>
+
+          <p>
+            Kami berkomitmen untuk memberikan pengalaman menonton yang cepat,
+            mudah, dan nyaman tanpa proses yang rumit. StreamClip dirancang agar
+            pengguna dapat menemukan konten favorit dengan lebih praktis.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="modal-contact"
+      class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4"
+    >
+      <div class="bg-streamDarkGray max-w-md w-full rounded-lg p-6 relative">
+        <button
+          onclick="closeModal('modal-contact')"
+          class="absolute top-4 right-4 text-gray-400"
+        >
+          ✕
+        </button>
+        <h2 class="text-xl text-white mb-4">Hubungi Kami</h2>
+
+        <form
+          name="hubungi-kami"
+          method="POST"
+          data-netlify="true"
+          class="space-y-4"
+        >
+          <input type="hidden" name="form-name" value="hubungi-kami" />
+          <input
+            type="text"
+            name="nama_pengirim"
+            placeholder="Nama Anda"
+            required
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          />
+          <textarea
+            name="pesan"
+            placeholder="Pesan Anda"
+            required
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          ></textarea>
+          <button
+            type="submit"
+            class="w-full bg-streamRed text-white py-2 rounded"
+          >
+            Kirim Pesan
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="modal-request"
+      class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4"
+    >
+      <div class="bg-streamDarkGray max-w-md w-full rounded-lg p-6 relative">
+        <button
+          onclick="closeModal('modal-request')"
+          class="absolute top-4 right-4 text-gray-400"
+        >
+          ✕
+        </button>
+        <h2 class="text-xl text-white mb-4">Request Film</h2>
+
+        <form
+          name="request-film"
+          method="POST"
+          data-netlify="true"
+          class="space-y-4"
+        >
+          <input type="hidden" name="form-name" value="request-film" />
+          <input
+            type="text"
+            name="nama_pemohon"
+            placeholder="Nama Anda"
+            required
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          />
+          <textarea
+            name="judul_film"
+            placeholder="Judul Film / Series"
+            required
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          ></textarea>
+          <button
+            type="submit"
+            class="w-full bg-streamRed text-white py-2 rounded"
+          >
+            Kirim Request
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="modal-report"
+      class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4"
+    >
+      <div class="bg-streamDarkGray max-w-md w-full rounded-lg p-6 relative">
+        <button
+          onclick="closeModal('modal-report')"
+          class="absolute top-4 right-4 text-gray-400"
+        >
+          ✕
+        </button>
+        <h2 class="text-xl text-white mb-4">Lapor Error</h2>
+
+        <form
+          name="lapor-error"
+          method="POST"
+          data-netlify="true"
+          class="space-y-4"
+        >
+          <input type="hidden" name="form-name" value="lapor-error" />
+          <input
+            type="text"
+            name="nama_pelapor"
+            placeholder="Nama Anda"
+            required
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          />
+          <input
+            type="text"
+            name="judul_film"
+            placeholder="Judul Film / Series"
+            required
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          />
+          <input
+            type="text"
+            name="episode"
+            placeholder="Episode (Opsional)"
+            class="w-full px-4 py-2 bg-gray-800 text-white rounded"
+          />
+          <button
+            type="submit"
+            class="w-full bg-streamRed text-white py-2 rounded"
+          >
+            Kirim Laporan
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="modal-privacy"
+      class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4"
+    >
+      <div class="bg-streamDarkGray max-w-lg w-full rounded-lg p-6 relative">
+        <button
+          onclick="closeModal('modal-privacy')"
+          class="absolute top-4 right-4 text-gray-400"
+        >
+          ✕
+        </button>
+
+        <h2 class="text-xl text-white mb-4">Kebijakan Privasi</h2>
+
+        <div
+          class="text-gray-300 text-sm leading-relaxed space-y-3 h-64 overflow-y-auto scrollbar-hide"
+        >
+          <p>
+            <strong>StreamClip</strong> menghormati privasi setiap pengguna yang
+            mengakses dan menggunakan layanan kami. Pengguna dapat menikmati
+            konten di StreamClip tanpa harus melakukan login atau pendaftaran
+            akun.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function openModal(id) {
+        document.getElementById(id).classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+      }
+      function closeModal(id) {
+        document.getElementById(id).classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+      }
+    </script>
+
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script type="module" src="script.js"></script>
+  </body>
+</html>

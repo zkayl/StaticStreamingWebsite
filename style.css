@@ -1,0 +1,335 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap");
+
+body {
+  font-family: "Inter", sans-serif;
+}
+.font-bebas {
+  font-family: "Bebas Neue", sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0f0f0f;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #e50914;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-down {
+  animation: fadeInDown 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.tab-btn {
+  padding: 8px 20px;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ccc;
+  background: rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  opacity: 1;
+  transform: translateX(0);
+}
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: white;
+}
+.tab-btn.active {
+  background: #e50914;
+  color: white;
+  border-color: #e50914;
+  box-shadow: 0 0 15px rgba(229, 9, 20, 0.4);
+}
+
+.tab-exit {
+  opacity: 0 !important;
+  transform: translateX(-30px) !important;
+  pointer-events: none;
+}
+@keyframes slideInTab {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.tab-enter {
+  animation: slideInTab 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+.movie-card {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.movie-card:hover {
+  transform: scale(1.05);
+  z-index: 10;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+.movie-card img {
+  transition: filter 0.3s ease;
+}
+.movie-card:hover img {
+  filter: brightness(1.1);
+}
+
+.watched-overlay {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #4ade80;
+  border: 1px solid #4ade80;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.episode-btn.watched-ep {
+  border-color: #333 !important;
+  color: #777 !important;
+  background: #111 !important;
+}
+.episode-btn.watched-ep div {
+  color: #777 !important;
+}
+.episode-btn.watched-ep .text-streamRed {
+  color: #882222 !important;
+}
+
+.cast-card {
+  min-width: 100px;
+  max-width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.cast-img-wrapper {
+  width: 90px;
+  height: 90px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #333;
+  margin-bottom: 8px;
+  transition: border-color 0.3s ease;
+}
+.cast-card:hover .cast-img-wrapper {
+  border-color: #e50914;
+}
+
+:root {
+  --plyr-color-main: #e50914;
+}
+.plyr--video .plyr__control.plyr__tab-focus,
+.plyr--video .plyr__control:hover,
+.plyr--video .plyr__control[aria-expanded="true"] {
+  background: #e50914 !important;
+}
+.plyr__menu__container .plyr__control--forward:after,
+.plyr__menu__container .plyr__control--back:after {
+  border-color: transparent transparent transparent #e50914;
+}
+
+#user-dropdown {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.95);
+  transition: all 0.2s ease-out;
+}
+
+#user-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+  display: block;
+}
+
+#user-dropdown {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.95);
+  transition: all 0.2s ease-out;
+}
+
+#user-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+  display: block;
+}
+
+@keyframes heartBurst {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.35);
+    opacity: 1;
+  }
+  60% {
+    transform: scale(1);
+  }
+  70% {
+    transform: rotate(-15deg);
+  }
+  80% {
+    transform: rotate(15deg);
+  }
+  90% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+.animate-pop-heart {
+  animation: heartBurst 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transform-origin: center center;
+  display: inline-block;
+}
+
+@keyframes heartBurst {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.35);
+    opacity: 1;
+  }
+  60% {
+    transform: scale(1);
+  }
+  70% {
+    transform: rotate(-15deg);
+  }
+  80% {
+    transform: rotate(15deg);
+  }
+  90% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+.animate-pop-heart {
+  animation: heartBurst 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transform-origin: center center;
+  display: inline-block;
+}
+
+@keyframes breakLeft {
+  0% {
+    transform: translate(0, 0) rotate(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-20px, 50px) rotate(-35deg);
+    opacity: 0;
+  }
+}
+
+@keyframes breakRight {
+  0% {
+    transform: translate(0, 0) rotate(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(20px, 50px) rotate(35deg);
+    opacity: 0;
+  }
+}
+
+.heart-container-stack {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heart-container-stack i,
+.heart-split-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heart-half-left {
+  clip-path: polygon(0 0, 50% 0, 58% 25%, 42% 50%, 58% 75%, 50% 100%, 0 100%);
+  animation: breakLeft 0.8s ease-in forwards;
+}
+
+.heart-half-right {
+  clip-path: polygon(
+    50% 0,
+    100% 0,
+    100% 100%,
+    50% 100%,
+    58% 75%,
+    42% 50%,
+    58% 25%
+  );
+  animation: breakRight 0.8s ease-in forwards;
+}
